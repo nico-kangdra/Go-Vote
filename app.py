@@ -1,5 +1,5 @@
-from flask import Flask, render_template, flash, request, url_for, redirect, session
-from services import get_nik, get_count, set_vote, get_status
+from flask import Flask, render_template, flash, request, redirect, session
+from services import get_nik, get_count, set_vote, get_status, hash
 
 # Initialize flask app
 app = Flask(__name__)
@@ -30,7 +30,7 @@ def getlogin():
 def postlogin():
     # Get data from Form
     nama_lengkap = request.form["nama_lengkap"].strip()
-    nik = request.form["nik"]
+    nik = hash(request.form["nik"])
     nama_ibu_kandung = request.form["nama_ibu_kandung"].strip()
     # Get nik from SQL in services.py
     res = get_nik(nik)
@@ -96,4 +96,4 @@ def logout():
 
 # Run the app when files execute
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=8000)
+    app.run(debug=True, host="0.0.0.0", port=8080)
