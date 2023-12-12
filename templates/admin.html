@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form method="post">
+        <h2>Add New Entry</h2>
+        <input type="number" placeholder="NIK" name="nik" id="nik" min=0 required>
+        <input type="text" placeholder="Nama Lengkap" name="nama_lengkap" id="nama_lengkap" required>
+        <input type="text" placeholder="Nama Ibu Kandung" name="nama_ibu_kandung" id="nama_ibu_kandung" required>
+        <input type="submit" value="Submit">
+    </form>
+
+    <br><br>
+
+    <table border="1px">
+        <tr>
+            <th>NIK</th>
+            <th>Nama Lengkap</th>
+            <th>Nama Ibu Kandung</th>
+            <th>Action</th>
+        </tr>
+        {% for x in data %}
+        <tr>
+            {% for y in x %}
+                <td>{{y}}</td>
+            {% endfor %}
+            <td>
+                <form action="/deletes/{{x[0]}}" method="post">
+                    <button type=submit>Delete</a>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+</body>
+</html>

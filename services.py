@@ -12,7 +12,7 @@ def execute(sql):
 
 
 def close(item):
-    for x in item:
+    for x in item.values():
         x.close()
 
 
@@ -48,3 +48,19 @@ def get_status(session):
         if res is None:
             return True
     return False
+
+def get_all():
+    item = execute("SELECT nik, nama_lengkap, nama_ibu_kandung FROM users")
+    res = item["cur"].fetchall()
+    close(item)
+    return res
+
+def insert(x,y,z):
+    item = execute(f"INSERT INTO users (nik, nama_lengkap, nama_ibu_kandung) VALUES ('{x}','{y}','{z}')")
+    item["con"].commit()
+    close(item)
+
+def delete(x):
+    item = execute(f"DELETE FROM users WHERE nik = '{x}'")
+    item["con"].commit()
+    close(item)

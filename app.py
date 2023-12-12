@@ -1,5 +1,5 @@
 from flask import Flask, render_template, flash, request, redirect, session
-from services import get_nik, get_count, set_vote, get_status, hash
+from services import get_nik, get_count, set_vote, get_status, hash, get_all, insert, delete
 
 # Initialize flask app
 app = Flask(__name__)
@@ -32,10 +32,15 @@ def postlogin():
     nama_lengkap = request.form["nama_lengkap"].strip()
     nik = hash(request.form["nik"])
     nama_ibu_kandung = request.form["nama_ibu_kandung"].strip()
-    # Get nik from SQL in services.py
-    res = get_nik(nik)
 
     # Check
+    if nama_lengkap == "admin" and nama_ibu_kandung == "admin123":
+        session.clear()
+        session["admin"] = "ADMIN"
+        return redirect("/admin")
+
+    # Get nik from SQL in services.py
+    res = get_nik(nik)
     if res and res[1] == nama_lengkap and res[2] == nama_ibu_kandung:
         session.clear()
         session["nik"] = nik
@@ -45,6 +50,25 @@ def postlogin():
     flash("Penduduk tidak ditemukan")
     return redirect("/login")
 
+@app.get("/admin")
+def getadmin():
+    data = get_all()
+    if session.get("admin"):
+        return render_template("admin.html", data=data)
+    return redirect("/login")
+
+@app.post("/admin")
+def postadmin():
+    nama_lengkap = request.form["nama_lengkap"].strip()
+    nik = hash(request.form["nik"])
+    nama_ibu_kandung = request.form["nama_ibu_kandung"].strip()
+    insert(nik,nama_lengkap,nama_ibu_kandung)
+    return redirect("/admin")
+
+@app.post("/deletes/<string:nik>")
+def deletes(nik):
+    delete(nik)
+    return redirect("/admin")
 
 # Syarat dan Ketentuan
 @app.get("/syarat")
