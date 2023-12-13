@@ -1,14 +1,16 @@
 from db import db_con
 from hashlib import sha256
 
+
 def hash(txt):
-    return sha256(txt.encode('utf-8')).hexdigest()
+    return sha256(txt.encode("utf-8")).hexdigest()
+
 
 def execute(sql):
     conn = db_con()
     curs = conn.cursor()
     curs.execute(sql)
-    return {"con":conn, "cur":curs}
+    return {"con": conn, "cur": curs}
 
 
 def close(item):
@@ -24,13 +26,19 @@ def get_nik(nik):
 
 
 def get_count():
-    item1 = execute(f"SELECT COUNT(*) FROM users WHERE vote = 1")
-    item2 = execute(f"SELECT COUNT(*) FROM users WHERE vote = 2")
-    item3 = execute(f"SELECT COUNT(*) FROM users WHERE vote = 3")
-    res = [item1["cur"].fetchone()[0], item2["cur"].fetchone()[0], item3["cur"].fetchone()[0]]
-    close(item1)
-    close(item2)
-    close(item3)
+    item = [
+        execute(f"SELECT COUNT(*) FROM users WHERE vote = 1"),
+        execute(f"SELECT COUNT(*) FROM users WHERE vote = 2"),
+        execute(f"SELECT COUNT(*) FROM users WHERE vote = 3"),
+    ]
+    res = [
+        item[0]["cur"].fetchone()[0],
+        item[1]["cur"].fetchone()[0],
+        item[2]["cur"].fetchone()[0],
+    ]
+    res = [res[x] + 1 if res[x] == 0 else x for x in range(len(res))]
+    for x in item:
+        close(x)
     return res
 
 
@@ -49,16 +57,21 @@ def get_status(session):
             return True
     return False
 
+
 def get_all():
     item = execute("SELECT nik, nama_lengkap, nama_ibu_kandung FROM users")
     res = item["cur"].fetchall()
     close(item)
     return res
 
-def insert(x,y,z):
-    item = execute(f"INSERT INTO users (nik, nama_lengkap, nama_ibu_kandung) VALUES ('{x}','{y}','{z}')")
+
+def insert(x, y, z):
+    item = execute(
+        f"INSERT INTO users (nik, nama_lengkap, nama_ibu_kandung) VALUES ('{x}','{y}','{z}')"
+    )
     item["con"].commit()
     close(item)
+
 
 def delete(x):
     item = execute(f"DELETE FROM users WHERE nik = '{x}'")

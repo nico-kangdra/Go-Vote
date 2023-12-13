@@ -1,5 +1,14 @@
 from flask import Flask, render_template, flash, request, redirect, session
-from services import get_nik, get_count, set_vote, get_status, hash, get_all, insert, delete
+from services import (
+    get_nik,
+    get_count,
+    set_vote,
+    get_status,
+    hash,
+    get_all,
+    insert,
+    delete,
+)
 
 # Initialize flask app
 app = Flask(__name__)
@@ -50,6 +59,7 @@ def postlogin():
     flash("Penduduk tidak ditemukan")
     return redirect("/login")
 
+
 @app.get("/admin")
 def getadmin():
     data = get_all()
@@ -57,18 +67,21 @@ def getadmin():
         return render_template("admin.html", data=data)
     return redirect("/login")
 
+
 @app.post("/admin")
 def postadmin():
     nama_lengkap = request.form["nama_lengkap"].strip()
     nik = hash(request.form["nik"])
     nama_ibu_kandung = request.form["nama_ibu_kandung"].strip()
-    insert(nik,nama_lengkap,nama_ibu_kandung)
+    insert(nik, nama_lengkap, nama_ibu_kandung)
     return redirect("/admin")
+
 
 @app.post("/deletes/<string:nik>")
 def deletes(nik):
     delete(nik)
     return redirect("/admin")
+
 
 # Syarat dan Ketentuan
 @app.get("/syarat")
