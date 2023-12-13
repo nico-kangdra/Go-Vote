@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
 <body>
     <form method="post">
         <h2>Add New Entry</h2>
@@ -24,9 +26,10 @@
             <th>Action</th>
         </tr>
         {% for x in data %}
+        {% if x[1] != "admin" %}
         <tr>
             {% for y in x %}
-                <td>{{y}}</td>
+            <td>{{y}}</td>
             {% endfor %}
             <td>
                 <form action="/deletes/{{x[0]}}" method="post">
@@ -34,8 +37,10 @@
                 </form>
             </td>
         </tr>
+        {% endif %}
         {% endfor %}
     </table>
-    
+
 </body>
+
 </html>
