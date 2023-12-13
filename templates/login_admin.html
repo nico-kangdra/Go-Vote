@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+</head>
+
+<body>
+    <form method="post">
+        <input type="number" placeholder="No ID" name="id" id="id" min=0 required>
+        <input type="text" placeholder="Username" name="username" id="username" required>
+        <input type="password" placeholder="Password" name="password" id="password" required>
+        <input type="submit" value="Submit">
+    </form>
+    {% for message in get_flashed_messages() %}
+    <div class="text-danger">{{ message }}</div>
+    {% endfor %}
+</body>
+
+</html>

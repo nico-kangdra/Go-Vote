@@ -1,4 +1,4 @@
-from db import db_con
+from services.db import db_con
 from hashlib import sha256
 
 

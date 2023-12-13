@@ -1,5 +1,5 @@
 from flask import Flask, render_template, flash, request, redirect, session
-from services import (
+from services.services import (
     get_nik,
     get_count,
     set_vote,
@@ -34,6 +34,12 @@ def getlogin():
     return render_template("login.html")
 
 
+# Admin Login
+@app.get("/login/admin")
+def getloginadmin():
+    return render_template("login_admin.html")
+
+
 # Post for Login
 @app.post("/login")
 def postlogin():
@@ -42,14 +48,10 @@ def postlogin():
     nik = hash(request.form["nik"])
     nama_ibu_kandung = request.form["nama_ibu_kandung"].strip()
 
-    # Check
-    if nama_lengkap == "admin" and nama_ibu_kandung == "admin123":
-        session.clear()
-        session["admin"] = "ADMIN"
-        return redirect("/admin")
-
     # Get nik from SQL in services.py
     res = get_nik(nik)
+
+    # Check
     if res and res[1] == nama_lengkap and res[2] == nama_ibu_kandung:
         session.clear()
         session["nik"] = nik
@@ -58,6 +60,22 @@ def postlogin():
         return redirect("/syarat")
     flash("Penduduk tidak ditemukan")
     return redirect("/login")
+
+
+# Post for Login
+@app.post("/login/admin")
+def postloginadmin():
+    # Get data from Form
+    id = request.form["id"]
+    username = request.form["username"].strip()
+    password = request.form["password"].strip()
+
+    # Check
+    res = get_nik(id)
+    if res and res[1] == username and res[2] == password:
+        session.clear()
+        session["admin"] = "ADMIN"
+        return redirect("/admin")
 
 
 @app.get("/admin")
