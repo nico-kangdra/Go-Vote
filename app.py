@@ -21,10 +21,14 @@ from services.services import (
 )
 import base64
 import cv2
+import os
 
 # Initialize flask app
 app = Flask(__name__)
 app.secret_key = "COMEGOVOTE"
+
+UPLOAD_FOLDER = "static/img/temp"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 # Camera
 camera = cv2.VideoCapture(0)
@@ -66,24 +70,10 @@ def capture_image():
         _, buffer = cv2.imencode(".jpg", frame)
         image_data = base64.b64encode(buffer).decode("utf-8")
 
-        # Perform face recognition on the captured image
-        label_text, distance_alike = preprocess_image(frame)
-
-        # Check if the recognition is successful
-        if label_text and distance_alike < 12:
-            # Redirect to /vote if the recognition is successful
-            return redirect("/vote")
-
-        # Return the image data as JSON
-        return jsonify(
-            {
-                "image_data": image_data,
-                "label_text": label_text,
-                "distance_alike": distance_alike,
-            }
-        )
-
-    return jsonify({"error": "Failed to capture image"})
+        # Save the image to the upload folder
+        image_filename = "captured_image.jpg"
+        image_path = os.path.join(app.config["UPLOAD_FOLDER"], image_filename)
+        return cv2.imwrite(image_path, frame)
 
 
 @app.get("/")
