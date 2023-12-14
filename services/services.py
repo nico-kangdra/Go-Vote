@@ -19,7 +19,7 @@ def close(item):
 
 
 def get_nik(nik):
-    item = execute(f"SELECT * FROM users WHERE nik = {nik}")
+    item = execute(f"SELECT * FROM users WHERE nik = '{nik}'")
     res = item["cur"].fetchone()
     close(item)
     return res
@@ -43,14 +43,14 @@ def get_count():
 
 
 def set_vote(x, nik):
-    item = execute(f"UPDATE users SET vote = {x} WHERE nik = {nik}")
+    item = execute(f"UPDATE users SET vote = {x} WHERE nik = '{nik}'")
     item["con"].commit()
     close(item)
 
 
 def get_status(session):
     if session.get("nik"):
-        item = execute(f"SELECT vote FROM users WHERE nik = {session['nik']}")
+        item = execute(f"SELECT vote FROM users WHERE nik = '{session['nik']}'")
         res = item["cur"].fetchone()[0]
         close(item)
         if res is None:

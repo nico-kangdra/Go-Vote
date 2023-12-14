@@ -25,23 +25,17 @@ def before_request():
 # Homepage
 @app.get("/")
 def home():
-    return render_template("index.html")
-
-
-# Login
-@app.get("/login")
-def getlogin():
-    return render_template("login.html")
+    return render_template("public/index.html")
 
 
 # Admin Login
 @app.get("/login/admin")
 def getloginadmin():
-    return render_template("login_admin.html")
+    return render_template("/admin/login_admin.html")
 
 
 # Post for Login
-@app.post("/login")
+@app.post("/")
 def postlogin():
     # Get data from Form
     nama_lengkap = request.form["nama_lengkap"].strip()
@@ -55,11 +49,12 @@ def postlogin():
     if res and res[1] == nama_lengkap and res[2] == nama_ibu_kandung:
         session.clear()
         session["nik"] = nik
+        session["nik_ori"] = request.form["nik"]
         session["nama_lengkap"] = nama_lengkap
         session["nama_ibu_kandung"] = nama_ibu_kandung
-        return redirect("/syarat")
+        return redirect("/profile")
     flash("Penduduk tidak ditemukan")
-    return redirect("/login")
+    return redirect("/")
 
 
 # Post for Login
@@ -82,8 +77,8 @@ def postloginadmin():
 def getadmin():
     data = get_all()
     if session.get("admin"):
-        return render_template("admin.html", data=data)
-    return redirect("/login")
+        return render_template("admin/admin.html", data=data)
+    return redirect("/login/admin")
 
 
 @app.post("/admin")
@@ -102,30 +97,41 @@ def deletes(nik):
 
 
 # Syarat dan Ketentuan
+@app.get("/profile")
+def getProfile():
+    # Check session
+    if session.get("nik"):
+        return render_template("/user/profile.html")
+    return redirect("/")
+
+
+# Syarat dan Ketentuan
 @app.get("/syarat")
 def getsyarat():
     # Check session
     if session.get("nik"):
-        return redirect("/verif")
-    return redirect("/login")
+        return render_template("/user/syarat.html")
+    return redirect("/")
 
 
 # Face Recognition
-@app.get("/verif")
+@app.get("/verify")
 def verif():
-    return ""
+    if session.get("nik"):
+        return render_template("/user/verify.html")
+    return redirect("/")
 
 
 # Coblos
-@app.get("/coblos")
+@app.get("/vote")
 def getcoblos():
     if get_status(session):
-        return render_template("coblos.html")
-    return redirect("/login")
+        return render_template("/user/vote.html")
+    return redirect("/")
 
 
 # Post for Coblos
-@app.post("/coblos")
+@app.post("/vote")
 def postcoblos():
     if session.get("nik"):
         vote = request.form["vote"]
@@ -139,14 +145,14 @@ def postcoblos():
 def preview():
     res = get_count()
     res = [round(x / sum(res) * 100, 2) for x in res]
-    return render_template("preview.html", res=res)
+    return render_template("/user/preview.html", res=res)
 
 
 # Logout
 @app.get("/logout")
 def logout():
     session.clear()
-    return redirect("/login")
+    return redirect("/")
 
 
 # Run the app when files execute
