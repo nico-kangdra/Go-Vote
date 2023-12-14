@@ -1,5 +1,8 @@
 from services.db import db_con
 from hashlib import sha256
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
 
 
 def hash(txt):
@@ -76,3 +79,44 @@ def get_status(session):
         if res is None:
             return True
     return False
+
+#function to detect face using OpenCV
+def detect_face(img):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    face_cascade = cv2.CascadeClassifier('static\model\haarcascade_frontalface_alt.xml')
+
+    #let's detect multiscale (some images may be closer to camera than others) images
+    #result is a list of faces
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.5, minNeighbors=3)
+
+    #if no faces are detected then return original img
+    if (len(faces) == 0):
+        return None, None
+
+    #under the assumption that there will be only one face,
+    #extract the face area
+    (x, y, w, h) = faces[0]
+
+    #return only the face part of the image
+    return gray[y:y+w, x:x+h]
+
+def preprocess_image(test_img):
+    subjects = ["", "Juan Situmorang", "Dozer Napitupulu", "Nico Kangdra"]
+
+    img = test_img.copy()
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    #detect face from the image
+    face = detect_face(img)
+
+    loaded_model = cv2.face.LBPHFaceRecognizer_create()
+    loaded_model.read('static\model\modelx_basewaug.xml')
+    #predict the image using our face recognizer
+    label = loaded_model.predict(face)
+
+    #get name of respective label returned by face recognizer
+    label_text = subjects[label[0]]
+    distanceAlike = label[1]
+
+    return label_text, distanceAlike

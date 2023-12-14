@@ -3,6 +3,9 @@
 Requirement:
 - Python
 - MySQL
+- OpenCV
+- Matplotlib
+- Numpy
 
 Setup: pip install -r requirements.txt
 
