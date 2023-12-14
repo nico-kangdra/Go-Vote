@@ -1,3 +1,6 @@
 pymysql
 flask
 python-dotenv
+numpy
+opencv-python
+matplotlib
