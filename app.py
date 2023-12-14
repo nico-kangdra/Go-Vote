@@ -32,7 +32,8 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 # Camera
 camera = cv2.VideoCapture(0)
-
+camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
 def generate_frames():
     while True:
@@ -73,7 +74,15 @@ def capture_image():
         # Save the image to the upload folder
         image_filename = "captured_image.jpg"
         image_path = os.path.join(app.config["UPLOAD_FOLDER"], image_filename)
-        return cv2.imwrite(image_path, frame)
+        cv2.imwrite(image_path, frame)
+        
+        label, distance = preprocess_image(image_path)
+        print(label) 
+        print(distance)
+
+        if session["nama_lengkap"] == label and distance < 20:
+            return redirect("/vote")
+        return jsonify({"image_data": image_data})
 
 
 @app.get("/")
@@ -176,9 +185,9 @@ def getsyarat():
 # Face Recognition
 @app.get("/verify")
 def verif():
-    # if get_status(session):
-    return render_template("/user/verify.html")
-    # return redirect("/preview")
+    if get_status(session):
+        return render_template("/user/verify.html")
+    return redirect("/preview")
 
 
 # Coblos

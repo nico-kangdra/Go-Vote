@@ -108,6 +108,7 @@ def preprocess_image(image_path):
 
     # Load the image from the provided path
     img = cv2.imread(image_path)
+    print(img.shape)
 
     # Convert image to RGB
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
