@@ -1,6 +1,18 @@
 {% extends 'base.html' %}{% block title %} Verification {% endblock title %} {%
 block body %}
 <div class="container my-3">
-  <h1 class="text-center">Verification your face</h1>
+  <h1 class="text-center mb-3">Verification your face</h1>
+  <img
+    id="cameraImage"
+    src="{{url_for('camera_feed')}}"
+    class="img-fluid rounded mb-3"
+    width="100%"
+    alt=""
+  />
+  <div class="d-grid gap-2">
+    <button onclick="captureImage()" class="btn btn-primary">
+      Capture Image
+    </button>
+  </div>
 </div>
 {% endblock body %}

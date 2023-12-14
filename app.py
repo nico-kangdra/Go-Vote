@@ -1,4 +1,13 @@
-from flask import Flask, render_template, flash, request, redirect, session
+from flask import (
+    Flask,
+    render_template,
+    flash,
+    request,
+    redirect,
+    session,
+    Response,
+    jsonify,
+)
 from services.services import (
     get_nik,
     get_count,
@@ -8,11 +17,34 @@ from services.services import (
     get_all,
     insert,
     delete,
+    preprocess_image,
 )
+import base64
+import cv2
+import os
 
 # Initialize flask app
 app = Flask(__name__)
 app.secret_key = "COMEGOVOTE"
+
+UPLOAD_FOLDER = "static/img/temp"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+# Camera
+camera = cv2.VideoCapture(0)
+camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+
+def generate_frames():
+    while True:
+        success, frame = camera.read()
+        if not success:
+            break
+        else:
+            ret, buffer = cv2.imencode(".jpg", frame)
+            frame = buffer.tobytes()
+
+        yield (b"--frame\r\n" b" Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
 
 
 # Set Session
@@ -20,6 +52,37 @@ app.secret_key = "COMEGOVOTE"
 def before_request():
     session.permanent = True
     app.permanent_session_lifetime = 600
+
+
+@app.route("/camera")
+def camera_feed():
+    return Response(
+        generate_frames(), mimetype="multipart/x-mixed-replace; boundary=frame"
+    )
+
+
+@app.route("/capture_image")
+def capture_image():
+    # Read a single frame from the camera
+    success, frame = camera.read()
+
+    if success:
+        # Encode the image to base64
+        _, buffer = cv2.imencode(".jpg", frame)
+        image_data = base64.b64encode(buffer).decode("utf-8")
+
+        # Save the image to the upload folder
+        image_filename = "captured_image.jpg"
+        image_path = os.path.join(app.config["UPLOAD_FOLDER"], image_filename)
+        cv2.imwrite(image_path, frame)
+        
+        label, distance = preprocess_image(image_path)
+        print(label) 
+        print(distance)
+
+        if session["nama_lengkap"] == label and distance < 20:
+            return redirect("/vote")
+        return jsonify({"image_data": image_data})
 
 
 @app.get("/")

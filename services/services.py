@@ -80,43 +80,51 @@ def get_status(session):
             return True
     return False
 
-#function to detect face using OpenCV
+
+# function to detect face using OpenCV
 def detect_face(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    
-    face_cascade = cv2.CascadeClassifier('static\model\haarcascade_frontalface_alt.xml')
 
-    #let's detect multiscale (some images may be closer to camera than others) images
-    #result is a list of faces
+    face_cascade = cv2.CascadeClassifier("static\model\haarcascade_frontalface_alt.xml")
+
+    # let's detect multiscale (some images may be closer to camera than others) images
+    # result is a list of faces
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.5, minNeighbors=3)
 
-    #if no faces are detected then return original img
-    if (len(faces) == 0):
+    # if no faces are detected then return original img
+    if len(faces) == 0:
         return None, None
 
-    #under the assumption that there will be only one face,
-    #extract the face area
+    # under the assumption that there will be only one face,
+    # extract the face area
     (x, y, w, h) = faces[0]
 
-    #return only the face part of the image
-    return gray[y:y+w, x:x+h]
+    # return only the face part of the image
+    return gray[y : y + w, x : x + h]
 
-def preprocess_image(test_img):
+
+def preprocess_image(image_path):
     subjects = ["", "Juan Situmorang", "Dozer Napitupulu", "Nico Kangdra"]
 
-    img = test_img.copy()
+    # Load the image from the provided path
+    img = cv2.imread(image_path)
+    print(img.shape)
+
+    # Convert image to RGB
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-    #detect face from the image
+    # Detect face from the image
     face = detect_face(img)
 
+    # Load the face recognition model
     loaded_model = cv2.face.LBPHFaceRecognizer_create()
-    loaded_model.read('static\model\modelx_basewaug.xml')
-    #predict the image using our face recognizer
+    loaded_model.read("static\model\modelx_basewaug.xml")
+
+    # Predict the image using our face recognizer
     label = loaded_model.predict(face)
 
-    #get name of respective label returned by face recognizer
+    # Get the name of the respective label returned by the face recognizer
     label_text = subjects[label[0]]
-    distanceAlike = label[1]
+    distance_alike = label[1]
 
-    return label_text, distanceAlike
+    return label_text, distance_alike
