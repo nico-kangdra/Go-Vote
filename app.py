@@ -43,9 +43,9 @@ def getloginadmin():
 @app.post("/login")
 def postlogin():
     # Get data from Form
-    nama_lengkap = request.form["nama_lengkap"].strip()
+    nama_lengkap = request.form["nama_lengkap"].strip().title()
     nik = hash(request.form["nik"])
-    nama_ibu_kandung = request.form["nama_ibu_kandung"].strip()
+    nama_ibu_kandung = request.form["nama_ibu_kandung"].strip().title()
 
     # Get nik from SQL in services.py
     res = get_nik(nik)
@@ -88,9 +88,9 @@ def getadmin():
 
 @app.post("/admin")
 def postadmin():
-    nama_lengkap = request.form["nama_lengkap"].strip()
+    nama_lengkap = request.form["nama_lengkap"].strip().title()
     nik = hash(request.form["nik"])
-    nama_ibu_kandung = request.form["nama_ibu_kandung"].strip()
+    nama_ibu_kandung = request.form["nama_ibu_kandung"].strip().title()
     insert(nik, nama_lengkap, nama_ibu_kandung)
     return redirect("/admin")
 
