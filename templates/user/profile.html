@@ -4,11 +4,7 @@ block body %}
   <h1>My Profile</h1>
   <div class="row mt-4">
     <div class="col-lg-4 col-sm-12">
-      <img
-        src="{{url_for('static', filename='img/images.png')}}"
-        class="img-fluid rounded"
-        alt=""
-      />
+      <img src="{{url_for('static', filename='img/images.png')}}" class="img-fluid rounded" alt="" />
     </div>
     <div class="col-lg-8 col-sm-12 user-detail-information">
       <div class="text-wrapper row">
@@ -24,16 +20,10 @@ block body %}
         <p class="detail col-9">{{ session.get('nama_ibu_kandung') }}</p>
       </div>
       <div class="d-flex">
-        <a
-          href="http://127.0.0.1:5000/logout"
-          class="btn btn-secondary col-lg-6 col-sm-12 m-3"
-        >
+        <a href="{{ url_for('logout') }}" class="btn btn-secondary col-lg-6 col-sm-12 m-3">
           Have Invalid Personal Information?
         </a>
-        <a
-          href="http://127.0.0.1:5000/syarat"
-          class="btn btn-primary col-lg-6 col-sm-12 m-3"
-        >
+        <a href="{{ url_for('getsyarat') }}" class="btn btn-primary col-lg-6 col-sm-12 m-3">
           Continue
         </a>
       </div>

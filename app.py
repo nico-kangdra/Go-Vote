@@ -3,8 +3,8 @@ from services.services import (
     get_nik,
     get_count,
     set_vote,
-    get_status,
     hash,
+    get_status,
     get_all,
     insert,
     delete,
@@ -22,8 +22,13 @@ def before_request():
     app.permanent_session_lifetime = 600
 
 
-# Homepage
 @app.get("/")
+def homepage():
+    return render_template("public/homepage.html")
+
+
+# Login
+@app.get("/login")
 def home():
     return render_template("public/index.html")
 
@@ -35,12 +40,12 @@ def getloginadmin():
 
 
 # Post for Login
-@app.post("/")
+@app.post("/login")
 def postlogin():
     # Get data from Form
-    nama_lengkap = request.form["nama_lengkap"].strip()
+    nama_lengkap = request.form["nama_lengkap"].strip().title()
     nik = hash(request.form["nik"])
-    nama_ibu_kandung = request.form["nama_ibu_kandung"].strip()
+    nama_ibu_kandung = request.form["nama_ibu_kandung"].strip().title()
 
     # Get nik from SQL in services.py
     res = get_nik(nik)
@@ -54,7 +59,7 @@ def postlogin():
         session["nama_ibu_kandung"] = nama_ibu_kandung
         return redirect("/profile")
     flash("Penduduk tidak ditemukan")
-    return redirect("/")
+    return redirect("/login")
 
 
 # Post for Login
@@ -83,9 +88,9 @@ def getadmin():
 
 @app.post("/admin")
 def postadmin():
-    nama_lengkap = request.form["nama_lengkap"].strip()
+    nama_lengkap = request.form["nama_lengkap"].strip().title()
     nik = hash(request.form["nik"])
-    nama_ibu_kandung = request.form["nama_ibu_kandung"].strip()
+    nama_ibu_kandung = request.form["nama_ibu_kandung"].strip().title()
     insert(nik, nama_lengkap, nama_ibu_kandung)
     return redirect("/admin")
 
@@ -100,26 +105,26 @@ def deletes(nik):
 @app.get("/profile")
 def getProfile():
     # Check session
-    if session.get("nik"):
+    if get_status(session):
         return render_template("/user/profile.html")
-    return redirect("/")
+    return redirect("/preview")
 
 
 # Syarat dan Ketentuan
 @app.get("/syarat")
 def getsyarat():
     # Check session
-    if session.get("nik"):
+    if get_status(session):
         return render_template("/user/syarat.html")
-    return redirect("/")
+    return redirect("/preview")
 
 
 # Face Recognition
 @app.get("/verify")
 def verif():
-    if session.get("nik"):
+    if get_status(session):
         return render_template("/user/verify.html")
-    return redirect("/")
+    return redirect("/preview")
 
 
 # Coblos
@@ -127,24 +132,26 @@ def verif():
 def getcoblos():
     if get_status(session):
         return render_template("/user/vote.html")
-    return redirect("/")
+    return redirect("/preview")
 
 
 # Post for Coblos
 @app.post("/vote")
 def postcoblos():
-    if session.get("nik"):
+    if get_status(session):
         vote = request.form["vote"]
         set_vote(int(vote), session["nik"])
-        return redirect("/preview")
-    return redirect("/login")
+    return redirect("/preview")
 
 
 # Preview
 @app.get("/preview")
 def preview():
     res = get_count()
-    res = [round(x / sum(res) * 100, 2) for x in res]
+    count = sum(res)
+    for x in range(len(res)):
+        if res[x] != 0:
+            res[x] = round(res[x] / count * 100, 1)
     return render_template("/user/preview.html", res=res)
 
 
@@ -152,7 +159,7 @@ def preview():
 @app.get("/logout")
 def logout():
     session.clear()
-    return redirect("/")
+    return redirect("/login")
 
 
 # Run the app when files execute

@@ -9,3 +9,4 @@ CREATE TABLE users (
     nama_ibu_kandung VARCHAR(100) NOT NULL,
     vote INT NULL
 );
+INSERT INTO users VALUES (123,'admin','Admin123',NULL);
