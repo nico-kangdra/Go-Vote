@@ -1,4 +1,13 @@
-from flask import Flask, render_template, flash, request, redirect, session
+from flask import (
+    Flask,
+    render_template,
+    flash,
+    request,
+    redirect,
+    session,
+    Response,
+    jsonify,
+)
 from services.services import (
     get_nik,
     get_count,
@@ -8,11 +17,29 @@ from services.services import (
     get_all,
     insert,
     delete,
+    preprocess_image,
 )
+import base64
+import cv2
 
 # Initialize flask app
 app = Flask(__name__)
 app.secret_key = "COMEGOVOTE"
+
+# Camera
+camera = cv2.VideoCapture(0)
+
+
+def generate_frames():
+    while True:
+        success, frame = camera.read()
+        if not success:
+            break
+        else:
+            ret, buffer = cv2.imencode(".jpg", frame)
+            frame = buffer.tobytes()
+
+        yield (b"--frame\r\n" b" Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
 
 
 # Set Session
@@ -20,6 +47,43 @@ app.secret_key = "COMEGOVOTE"
 def before_request():
     session.permanent = True
     app.permanent_session_lifetime = 600
+
+
+@app.route("/camera")
+def camera_feed():
+    return Response(
+        generate_frames(), mimetype="multipart/x-mixed-replace; boundary=frame"
+    )
+
+
+@app.route("/capture_image")
+def capture_image():
+    # Read a single frame from the camera
+    success, frame = camera.read()
+
+    if success:
+        # Encode the image to base64
+        _, buffer = cv2.imencode(".jpg", frame)
+        image_data = base64.b64encode(buffer).decode("utf-8")
+
+        # Perform face recognition on the captured image
+        label_text, distance_alike = preprocess_image(frame)
+
+        # Check if the recognition is successful
+        if label_text and distance_alike < 12:
+            # Redirect to /vote if the recognition is successful
+            return redirect("/vote")
+
+        # Return the image data as JSON
+        return jsonify(
+            {
+                "image_data": image_data,
+                "label_text": label_text,
+                "distance_alike": distance_alike,
+            }
+        )
+
+    return jsonify({"error": "Failed to capture image"})
 
 
 @app.get("/")
@@ -122,9 +186,9 @@ def getsyarat():
 # Face Recognition
 @app.get("/verify")
 def verif():
-    if get_status(session):
-        return render_template("/user/verify.html")
-    return redirect("/preview")
+    # if get_status(session):
+    return render_template("/user/verify.html")
+    # return redirect("/preview")
 
 
 # Coblos
