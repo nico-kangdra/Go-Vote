@@ -36,7 +36,6 @@ def get_count():
         item[1]["cur"].fetchone()[0],
         item[2]["cur"].fetchone()[0],
     ]
-    res = [res[x] + 1 if res[x] == 0 else x for x in range(len(res))]
     for x in item:
         close(x)
     return res
@@ -46,16 +45,6 @@ def set_vote(x, nik):
     item = execute(f"UPDATE users SET vote = {x} WHERE nik = '{nik}'")
     item["con"].commit()
     close(item)
-
-
-def get_status(session):
-    if session.get("nik"):
-        item = execute(f"SELECT vote FROM users WHERE nik = '{session['nik']}'")
-        res = item["cur"].fetchone()[0]
-        close(item)
-        if res is None:
-            return True
-    return False
 
 
 def get_all():
@@ -77,3 +66,13 @@ def delete(x):
     item = execute(f"DELETE FROM users WHERE nik = '{x}'")
     item["con"].commit()
     close(item)
+
+
+def get_status(session):
+    if session.get("nik"):
+        item = execute(f"SELECT vote FROM users WHERE nik = '{session['nik']}'")
+        res = item["cur"].fetchone()[0]
+        close(item)
+        if res is None:
+            return True
+    return False
