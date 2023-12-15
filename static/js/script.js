@@ -8,13 +8,13 @@ function captureImage() {
         })
       ).then(res => {
         document.getElementById("cameraImage").src = "data:image/jpeg;base64," + res.data.image_data;
-          console.log(res.status, res.data.image_data)
+        document.getElementById("message_text").textContent = res.data.message
+        document.getElementById("warning_box").style.display = "block"
+        console.log(res.status, res.data.image_data)
       })
       
         if (response.redirected) {
           window.location = response.url
-        } else {
-          showLoginError()
         }
     }
 )
