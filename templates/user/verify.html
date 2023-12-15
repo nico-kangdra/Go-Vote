@@ -2,6 +2,11 @@
 block body %}
 <div class="container my-3">
   <h1 class="text-center mb-3">Verification your face</h1>
+  <div class="container p-4 mb-3" id="warning_box" style="background: rgba(238, 210, 2, 0.5); display: none;">
+    <div class="text-center" id="message_text">
+    </div>
+    
+  </div>
   <img
     id="cameraImage"
     src="{{url_for('camera_feed')}}"

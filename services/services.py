@@ -93,7 +93,7 @@ def detect_face(img):
 
     # if no faces are detected then return original img
     if len(faces) == 0:
-        return None, None
+        return None
 
     # under the assumption that there will be only one face,
     # extract the face area
@@ -115,16 +115,18 @@ def preprocess_image(image_path):
 
     # Detect face from the image
     face = detect_face(img)
+    if face is not None:
+        # Load the face recognition model
+        loaded_model = cv2.face.LBPHFaceRecognizer_create()
+        loaded_model.read("static\model\modelx_basewaug.xml")
 
-    # Load the face recognition model
-    loaded_model = cv2.face.LBPHFaceRecognizer_create()
-    loaded_model.read("static\model\modelx_basewaug.xml")
+        # Predict the image using our face recognizer
+        label = loaded_model.predict(face)
 
-    # Predict the image using our face recognizer
-    label = loaded_model.predict(face)
+        # Get the name of the respective label returned by the face recognizer
+        label_text = subjects[label[0]]
+        distance_alike = label[1]
 
-    # Get the name of the respective label returned by the face recognizer
-    label_text = subjects[label[0]]
-    distance_alike = label[1]
-
-    return label_text, distance_alike
+        return label_text, distance_alike
+    else:
+        return None, None 

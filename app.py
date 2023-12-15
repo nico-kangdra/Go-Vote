@@ -77,12 +77,16 @@ def capture_image():
         cv2.imwrite(image_path, frame)
         
         label, distance = preprocess_image(image_path)
-        print(label) 
-        print(distance)
+        if label is None :
+            print(label)
+            return jsonify({"image_data": image_data, "message": "Please make sure you are in place in proper lightning and your full face showing on the camera"})
+        else:
+            print(label) 
+            print(distance)
 
-        if session["nama_lengkap"] == label and distance < 20:
-            return redirect("/vote")
-        return jsonify({"image_data": image_data})
+            if session["nama_lengkap"] == label and distance < 20:
+                return redirect("/vote")
+            return jsonify({"image_data": image_data, "message": "Invalid face credential"})
 
 
 @app.get("/")
