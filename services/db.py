@@ -7,8 +7,8 @@ load_dotenv()
 
 def db_con():
     return pymysql.connect(
-        host=getenv("DB_HOST"),
-        db=getenv("DB_NAME"),
-        user=getenv("DB_USER"),
-        password=getenv("DB_PASS"),
+        host="34.101.42.68",
+        db="govote",
+        user="govote",
+        password="123",
     )

@@ -31,9 +31,9 @@ UPLOAD_FOLDER = "static/img/temp"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 # Camera
-camera = cv2.VideoCapture(0)
-camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+#camera = cv2.VideoCapture(0)
+#camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+#camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
 def generate_frames():
     while True:
@@ -189,9 +189,9 @@ def getsyarat():
 # Face Recognition
 @app.get("/verify")
 def verif():
-    if get_status(session):
-        return render_template("/user/verify.html")
-    return redirect("/preview")
+#    if get_status(session):
+#        return render_template("/user/verify.html")
+    return redirect("/vote")
 
 
 # Coblos
